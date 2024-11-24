@@ -1,12 +1,18 @@
 import React, { useContext } from 'react'
 import { plans,assets } from '../assets/assets.js'
 import {AppContext} from '../context/AppContex'
+import { motion } from 'motion/react'
 
 const BuyCredits = () => {
   const {user} =useContext(AppContext)
 
   return (
-    <div className='min-h-[80vh] pt-10 mb-10 text-center'>
+    <motion.div
+    initial={{opacity:0.2,y:100}}
+    transition={{duration:1}}
+    whileInView={{opacity:1,y:0}}
+    viewport={{once:true}}
+     className='min-h-[80vh] pt-10 mb-10 text-center'>
       <button className='py-2 px-10 border border-gray-400 rounded-full mb-6'>Our Plans</button>
       <h1 className='text-center text-3xl font-medium mb-6 sm:mb-10'>Choose the plan</h1>
 
@@ -21,7 +27,7 @@ const BuyCredits = () => {
             </div>
         ))}
       </div>
-    </div>
+    </motion.div>
   )
 }
 

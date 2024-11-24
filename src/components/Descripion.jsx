@@ -1,9 +1,15 @@
 import React from 'react'
 import { assets } from '../assets/assets'
+import { motion } from 'motion/react'
 
 function Descripion() {
   return (
-    <div className='flex flex-col items-center justify-center my-20'>
+    <motion.div
+    initial={{opacity:0.2,y:100}}
+    transition={{duration:1}}
+    whileInView={{opacity:1,y:0}}
+    viewport={{once:true}}
+    className='flex flex-col items-center justify-center my-20'>
     <h1 className='text-3xl sm:text-4xl mb-2 font-semibold'>Create AI Images</h1>
     <p className='text-lg mb-8 text-gray-600'>Turn your imagination into visuals</p>
     
@@ -15,7 +21,7 @@ function Descripion() {
             <p className='text-gray-600'>Simply type in a text prompt, and our cutting-edge AI will generate high quality images in seconds. From product visuals to character designs and portraits, even concepts that dont yet exist can be visualized effortlessly. Powered by advanced AI technology, the creative possibilities are limitless.</p>
         </div>
     </div>
-    </div>
+    </motion.div>
   )
 }
 
