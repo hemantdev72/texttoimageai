@@ -2,9 +2,64 @@ import React, { useContext } from 'react'
 import { plans,assets } from '../assets/assets.js'
 import {AppContext} from '../context/AppContex'
 import { motion } from 'motion/react'
+import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
 
 const BuyCredits = () => {
-  const {user} =useContext(AppContext)
+  const {user,setShowLogin,token,getCredit} =useContext(AppContext)
+  const navigate=useNavigate();
+
+  async function initPay(order){
+    const options={
+      key:import.meta.env.VITE_RAZORPAY_KEY_ID,
+      amount:order.amount,
+      currency:order.currency,
+      name:'Credit Payment',
+      description:"Credit Payment",
+      order_id:order.id,
+      receipt:order.receipt,
+      handler:async(response)=>{
+        try{
+          const {data}=await axios.post("http://localhost:3000/api/user/verify-pay",response,{headers:{token}})
+          if(data.success){
+            getCredit();
+            navigate("/")
+          }
+        } catch(error){ 
+          return res,json({success:false,message:error.message})
+        }
+      },
+      
+    }
+
+    let rzp=new window.Razorpay(options);
+    rzp.open();
+  }
+
+  async function razorpayPayment(plan){
+    try{
+      if(!user){
+        setShowLogin(true);
+      }
+
+      let {data}=await axios.post("http://localhost:3000/api/user/razor-pay",{plan},{
+        headers:{token}
+      })
+    
+      console.log(data);
+
+
+      if(data.success){
+        initPay(data.order)
+      }
+
+
+    } catch(error){
+      console.log(error.message)
+      console.log("razorpay Payment catch error")
+      
+    }
+  }
 
   return (
     <motion.div
@@ -23,7 +78,7 @@ const BuyCredits = () => {
             <p className='font-semibold mt-3 mb-1'>{item.id}</p>
             <p className='text-sm'>{item.desc}</p>
             <p className='mt-6'><span className='font-medium text-3xl'>${item.price}</span>/ {item.credits} credits</p>
-            <button className='w-full bg-gray-800 text-white py-2.5 rounded-md text-sm min-w-52 mt-8 '>{user? "Purchase":"Get Started"}</button>
+            <button onClick={()=>{razorpayPayment(item.id)}} className='w-full bg-gray-800 text-white py-2.5 rounded-md text-sm min-w-52 mt-8 '>{user? "Purchase":"Get Started"}</button>
             </div>
         ))}
       </div>

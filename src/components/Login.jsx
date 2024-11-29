@@ -29,11 +29,9 @@ const Login = () => {
 
                 if(data.success){
                    localStorage.setItem("token",data.token);
-                   localStorage.setItem("user",JSON.stringify(data.user));
                    setShowLogin(false);
                     setUser(data.user);
                     setToken(data.token)
-                    setCredit(data.credits)
                 } else{
                     console.log("error");
                 }
@@ -42,7 +40,6 @@ const Login = () => {
             
                 if(data.success){
                    localStorage.setItem("token,",data.token);
-                   localStorage.setItem("user",JSON.stringify(data.user));
                     setUser(data.user);
                     setCredit(data.credits)
                     setShowLogin(false);

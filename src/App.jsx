@@ -8,6 +8,8 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Login from './components/Login';
 import { AppContext } from './context/AppContex';
+import PrivateRoute from './pages/PrivateRoute';
+import NotFound from './pages/NotFound';
 
 
 
@@ -21,8 +23,13 @@ function App() {
         {showLogin && <Login />}
         <Routes>
           <Route path='/' element={<Home />} />
-          <Route path='/result' element={<Result />} />
+          <Route path='/result'  element={
+                            <PrivateRoute>
+                                <Result />
+                            </PrivateRoute>
+                        }  />
           <Route path='/buycredits' element={<BuyCredit />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
         <Footer />
       </div>

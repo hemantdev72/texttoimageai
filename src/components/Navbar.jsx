@@ -29,7 +29,7 @@ const Navbar = () => {
             <button className="flex items-center gap-2 bg-blue-100 px-4 sm:px-6 py-1.5 sm:py-2 rounded-full hover:scale-105 transition-all duration-700">
               <img src={assets.credit_star} className="w-5" alt="" />
               <p className="text-xs sm:text-sm font-medium text-gray-600 ">
-                Credits left : {user.credits}
+                Credits left : {credit}
               </p>
             </button>
             <p className="text-gray-600 max-sm:hidden pl-4">Hi, {user.name}</p>
