@@ -1,10 +1,20 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { assets } from '../assets/assets'
 import { useNavigate } from 'react-router-dom'
 import {motion} from 'motion/react';
+import { AppContext } from '../context/AppContex';
 
 const Header = () => {
     const navigate=useNavigate();
+    const {user,setShowLogin}=useContext(AppContext)
+
+    const onClickHandler=()=>{
+        if(user){
+            navigate("/result"); 
+        } else{
+            setShowLogin(true)
+        }
+    }
 
   return (
     <motion.div className='flex flex-col justify-center items-center text-center my-20' initial={{opacity:0.2,y:100}} transition={{duration:1}} whileInView={{opacity:1,y:0}} viewport={{once:true}}>
@@ -17,7 +27,7 @@ const Header = () => {
     
         <motion.p initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{delay:0.6,duration:0.8}} className='text-center max-w-xl mx-auto mt-5'>Unleash your creativity with AI. Turn your imagination into visual art in seconds - just type, and watch the magic happen</motion.p>
 
-        <motion.button onClick={()=>{navigate('/result')}} className='sm:text-lg text-white bg-black w-auto mt-8 px-12 py-2.5 flex items-center gap-2 rounded-full'
+        <motion.button onClick={onClickHandler} className='sm:text-lg text-white bg-black w-auto mt-8 px-12 py-2.5 flex items-center gap-2 rounded-full'
             whileHover={{scale:1.05}}
             whileTap={{scale:0.95}}
             initial={{opacity:0}}

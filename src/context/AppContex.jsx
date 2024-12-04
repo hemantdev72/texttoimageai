@@ -2,6 +2,7 @@ import { createContext, useEffect, useState } from "react";
 import App from "../App";
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export const AppContext=createContext();
 
@@ -9,7 +10,7 @@ const AppContextProvider=({children})=>{
     const [user,setUser]=useState(false);    
     const [showLogin,setShowLogin]=useState(false); 
     const [token,setToken]=useState(localStorage.getItem("token"))
-    const [credit,setCredit]=useState(0);
+    const [credit,setCredit]=useState(false);
     const backend=import.meta.env.VITE_BACKEND_URL;
     const navigate=useNavigate();
 
@@ -18,12 +19,12 @@ const AppContextProvider=({children})=>{
             const {data}=await axios.get(`http://localhost:3000/api/user/credit`,{
                 headers:{token}
             })
-            console.log(data);
             if(data.success){
                 setCredit(data.credits);
-                localStorage.setItem("user",JSON.stringify(data.user));
+                setUser(data.user);
+               
             } else{
-                console.log("error while fetching credits")
+               toast.error(data.message)
             }
         } catch(error){
             console.log(error);
@@ -35,25 +36,35 @@ const AppContextProvider=({children})=>{
             const {data}=await axios.post("http://localhost:3000/api/image/generate-image",{prompt},{
                 headers:{token}
             });
-            console.log(data);
-
             if(data.success){
                 getCredit();
                 return data.resultImage
             } else{
+                toast.error(data.message)
                 getCredit();
-                if(data.creditBalance===0){
+                if(data.credits===0){
                     navigate("/buycredits")
                 }
             }
         } catch(error){
-            console.log(error)
+            toast.error(error.message)
         }
     }
 
+    const logout=()=>{
+        localStorage.removeItem("token");
+        setToken("")
+        setUser(null)
+        navigate("/")
+    }
+
     useEffect(() => {
-        getCredit();
-        setToken(localStorage.getItem("token")); 
+        if(token){
+            getCredit();
+        }else{
+            setToken(localStorage.getItem("token")); 
+        }
+        
         const data = localStorage.getItem("user");
         if (data) {
             try {
@@ -70,7 +81,7 @@ const AppContextProvider=({children})=>{
     
     
     const value={
-        user,setUser,showLogin,setShowLogin,backend,token,setToken,credit,setCredit,generateImage,getCredit
+        user,setUser,showLogin,setShowLogin,backend,token,setToken,credit,setCredit,generateImage,getCredit,logout
     }
 
     return (

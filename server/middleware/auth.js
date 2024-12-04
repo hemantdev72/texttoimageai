@@ -3,13 +3,14 @@ import jwt from 'jsonwebtoken';
 export const auth=(req,res,next)=>{
     const {token}=req.headers;
 
+    if(!token){
+        return res.status(400).json({
+            success:false,
+            message:"User not authorized"
+        })
+    }
     try{
-        if(!token){
-            return res.status(400).json({
-                success:false,
-                message:"User not authorized"
-            })
-        }
+        
     
         const decode=jwt.verify(token,process.env.JWT_SECRET);
     

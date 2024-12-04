@@ -12,7 +12,6 @@ const Result = () => {
 
  async function handleSubmit(e){
   e.preventDefault();
-  console.log("clicled");
   setLoading(true);
 
   if(input){

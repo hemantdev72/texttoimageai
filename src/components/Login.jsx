@@ -2,10 +2,11 @@ import React,{useContext, useEffect, useState} from 'react'
 import { assets } from '../assets/assets'
 import { AppContext } from '../context/AppContex';
 import axios from 'axios'
+import { toast } from 'react-toastify';
 
 const Login = () => {
     const [state,setState]=useState('Login');
-    const {setShowLogin,backend,setUser,setToken,setCredit}=useContext(AppContext);
+    const {setShowLogin,backend,setUser,setToken,setCredit,getCredit}=useContext(AppContext);
     const [name,setName]=useState("");
     const [email,setEmail]=useState("");
     const [password,setPassword]=useState("");
@@ -29,26 +30,28 @@ const Login = () => {
 
                 if(data.success){
                    localStorage.setItem("token",data.token);
-                   setShowLogin(false);
-                    setUser(data.user);
-                    setToken(data.token)
+                    
+setUser(data.user);
+setToken(data.token)
+setShowLogin(false)
+                    
                 } else{
-                    console.log("error");
+                    toast.error(data.message)
                 }
             } else{
                 const {data}=await axios.post(`${backend}/user/register`,{email,password,name})
             
                 if(data.success){
                    localStorage.setItem("token,",data.token);
-                    setUser(data.user);
-                    setCredit(data.credits)
+                   setToken(data.token) 
+                   setUser(data.user);
                     setShowLogin(false);
                 } else{
-                    console.log("error");
+                    toast.error(data.message)
                 }
             }
         } catch(error){
-            console.log(error.message)
+            toast.error(error.message)
         }
     }
 

@@ -4,6 +4,7 @@ import {AppContext} from '../context/AppContex'
 import { motion } from 'motion/react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
 const BuyCredits = () => {
   const {user,setShowLogin,token,getCredit} =useContext(AppContext)
@@ -24,8 +25,10 @@ const BuyCredits = () => {
           if(data.success){
             getCredit();
             navigate("/")
+            toast.success("Credits Added")
           }
         } catch(error){ 
+          toast.error(error.message)
           return res,json({success:false,message:error.message})
         }
       },
@@ -46,17 +49,14 @@ const BuyCredits = () => {
         headers:{token}
       })
     
-      console.log(data);
-
-
       if(data.success){
         initPay(data.order)
       }
 
 
     } catch(error){
-      console.log(error.message)
-      console.log("razorpay Payment catch error")
+      toast.error(error.message)
+      
       
     }
   }

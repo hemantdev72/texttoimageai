@@ -38,7 +38,7 @@ export const register=async (req,res)=>{
     res.status(200).json({
         success:true,
         token,
-       user: {name:user.name,credits:user.credits},
+       user: {name:user.name},
         message:"User created successfully"
     })
 
@@ -84,7 +84,7 @@ export const login=async (req,res)=>{
             success:true,
             message:"Login successfully",
             token,
-            user:{name:user.name,credits:user.credits}
+            user:{name:user.name}
         })
     } catch(error){
         return res.status(400).json({

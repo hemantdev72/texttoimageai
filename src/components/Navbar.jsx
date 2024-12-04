@@ -5,15 +5,9 @@ import { AppContext } from "../context/AppContex.jsx";
 
 const Navbar = () => {
   const navigate = useNavigate();
-    const {user,setShowLogin,setUser,setToken,setCredit,credit}=useContext(AppContext)
+    const {user,setShowLogin,setUser,setToken,setCredit,credit,logout}=useContext(AppContext)
 
-    function logout(){
-      localStorage.setItem("token","");
-      localStorage.setItem("user","");
-      setUser(null);
-      setToken(null);
-      setCredit(0);
-  }
+    
 
   
 
@@ -26,7 +20,7 @@ const Navbar = () => {
       <div>
         {user ? (
           <div className="flex items-center gap-2 sm:gap-3">
-            <button className="flex items-center gap-2 bg-blue-100 px-4 sm:px-6 py-1.5 sm:py-2 rounded-full hover:scale-105 transition-all duration-700">
+            <button onClick={()=>navigate("/buycredits")} className="flex items-center gap-2 bg-blue-100 px-4 sm:px-6 py-1.5 sm:py-2 rounded-full hover:scale-105 transition-all duration-700">
               <img src={assets.credit_star} className="w-5" alt="" />
               <p className="text-xs sm:text-sm font-medium text-gray-600 ">
                 Credits left : {credit}
