@@ -16,7 +16,7 @@ const AppContextProvider=({children})=>{
 
     async function getCredit(){
         try{
-            const {data}=await axios.get(`http://localhost:3000/api/user/credit`,{
+            const {data}=await axios.get(`https://texttoimageai-kirx.onrender.com/api/user/credit`,{
                 headers:{token}
             })
             if(data.success){
@@ -33,7 +33,7 @@ const AppContextProvider=({children})=>{
 
     async function generateImage(prompt){
         try{
-            const {data}=await axios.post("http://localhost:3000/api/image/generate-image",{prompt},{
+            const {data}=await axios.post("https://texttoimageai-kirx.onrender.com/api/image/generate-image",{prompt},{
                 headers:{token}
             });
             if(data.success){
