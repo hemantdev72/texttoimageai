@@ -21,7 +21,7 @@ const BuyCredits = () => {
       receipt:order.receipt,
       handler:async(response)=>{
         try{
-          const {data}=await axios.post("http://localhost:3000/api/user/verify-pay",response,{headers:{token}})
+          const {data}=await axios.post("https://texttoimageai-kirx.onrender.com/api/user/verify-pay",response,{headers:{token}})
           if(data.success){
             getCredit();
             navigate("/")
