@@ -25,7 +25,7 @@ const Login = () => {
 
         try{
             if(state=="Login"){
-                const {data}=await axios.post(`http://localhost:3000/api/user/login`,{email,password})
+                const {data}=await axios.post(`https://texttoimageai-kirx.onrender.com/api/user/login`,{email,password})
                 
 
                 if(data.success){
