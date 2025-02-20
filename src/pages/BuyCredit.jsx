@@ -45,7 +45,7 @@ const BuyCredits = () => {
         setShowLogin(true);
       }
 
-      let {data}=await axios.post("http://localhost:3000/api/user/razor-pay",{plan},{
+      let {data}=await axios.post("https://texttoimageai-kirx.onrender.com/api/user/razor-pay",{plan},{
         headers:{token}
       })
     
