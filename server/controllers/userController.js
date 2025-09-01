@@ -38,7 +38,7 @@ export const register=async (req,res)=>{
     res.status(200).json({
         success:true,
         token,
-       user: {name:user.name},
+       user: {name:user.name, credits:user.credits},
         message:"User created successfully"
     })
 
@@ -84,7 +84,7 @@ export const login=async (req,res)=>{
             success:true,
             message:"Login successfully",
             token,
-            user:{name:user.name}
+            user:{name:user.name, credits:user.credits}
         })
     } catch(error){
         return res.status(400).json({
@@ -98,8 +98,30 @@ export const login=async (req,res)=>{
 
 export const userCredit=async (req,res)=>{
     const {userId}=req.body;
+    console.log('=== USER CREDIT DEBUG ===');
+    console.log('userCredit - userId:', userId);
+    console.log('userCredit - req.body:', req.body);
+    console.log('userCredit - req.headers:', JSON.stringify(req.headers, null, 2));
+    
+    if(!userId) {
+        console.log('userCredit - No userId found in req.body');
+        return res.status(400).json({
+            success: false,
+            message: "User ID not found"
+        });
+    }
+    
     try{
         const user=await User.findById(userId);
+        console.log('userCredit - Found user:', user);
+
+        if(!user) {
+            console.log('userCredit - User not found in database');
+            return res.status(400).json({
+                success: false,
+                message: "User not found"
+            });
+        }
 
         return res.status(200).json({
             success:true,
@@ -107,6 +129,7 @@ export const userCredit=async (req,res)=>{
             credits:user.credits
         })
     }catch(error){
+        console.log('userCredit - Error:', error);
         return res.status(400).json({
             success:false,
             message:error.message
@@ -115,10 +138,18 @@ export const userCredit=async (req,res)=>{
 
 }
 
-const razorpayInstance=new razorpay({
-    key_id:process.env.RAZORPAY_KEY_ID,
-    key_secret:process.env.RAZORPAY_SECRET
-})
+let razorpayInstance;
+try {
+    razorpayInstance = new razorpay({
+        key_id: process.env.RAZORPAY_KEY_ID,
+        key_secret: process.env.RAZORPAY_SECRET
+    });
+    if (!razorpayInstance) {
+        console.error('Failed to initialize Razorpay instance');
+    }
+} catch (error) {
+    console.error('Error initializing Razorpay:', error);
+}
 
 export const razorpayPayment=async (req,res)=>{
     let {userId,plan}=req.body;
@@ -173,13 +204,10 @@ export const razorpayPayment=async (req,res)=>{
         receipt:newTransaction._id,
     }
 
-    await razorpayInstance.orders.create(options,(error,order)=>{
-        if(error){
-            return res.json({success:false,message:error})
-        }
+    const order = await razorpayInstance.orders.create(options);
+console.log("🧾 Razorpay order created:", order);
+return res.json({ success: true, order });
 
-        return res.json({success:true,order})
-    })
 
     } catch(error){
         return res.json({success:false,message:error.message})
@@ -206,10 +234,11 @@ export const verifyRazorpay=async (req,res)=>{
         let creditBalance=userData.credits + transactionData.credits;
         await User.findByIdAndUpdate(userData._id,{credits:creditBalance})
 
-        await Transaction.findByIdAndUpdate(transactionData._id,{credits:creditBalance})
+        await Transaction.findByIdAndUpdate(transactionData._id,{payment:true})
         res.json({
             success:true,
-            message:"Credit Added"
+            message:"Credit Added",
+            credits: creditBalance
         })
     } else{
         return res.json({

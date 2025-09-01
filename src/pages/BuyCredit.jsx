@@ -1,14 +1,25 @@
-import React, { useContext } from 'react'
-import { plans,assets } from '../assets/assets.js'
-import {AppContext} from '../context/AppContex'
-import { motion } from 'motion/react'
-import axios from 'axios'
+import React from 'react'
+import { plans, assets } from '../assets/assets.js'
+import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { useSelector, useDispatch } from 'react-redux'
+import { setShowLogin } from '../redux/slices/userSlice'
+import { razorpayPayment, verifyRazorpay, getCredit } from '../redux/slices/creditSlice'
 
 const BuyCredits = () => {
-  const {user,setShowLogin,token,getCredit} =useContext(AppContext)
-  const navigate=useNavigate();
+  const user = useSelector(state => state.user.user);
+  const token = useSelector(state => state.user.token);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
+
+if (!razorpayKey) {
+  toast.error("Payment setup error: Razorpay key missing.");
+  return;
+}
+
 
   async function initPay(order){
     const options={
@@ -21,43 +32,44 @@ const BuyCredits = () => {
       receipt:order.receipt,
       handler:async(response)=>{
         try{
-          const {data}=await axios.post("https://texttoimageai-kirx.onrender.com/api/user/verify-pay",response,{headers:{token}})
-          if(data.success){
-            getCredit();
+          const resultAction = await dispatch(verifyRazorpay(response));
+          if(!resultAction.error){
+            dispatch(getCredit());
             navigate("/")
             toast.success("Credits Added")
+          } else {
+            toast.error(resultAction.payload);
           }
         } catch(error){ 
-          toast.error(error.message)
-          return res,json({success:false,message:error.message})
+          toast.error(error.message);
         }
       },
-      
     }
 
-    let rzp=new window.Razorpay(options);
-    rzp.open();
+    try {
+      let rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (error) {
+      toast.error("Failed to initialize payment: " + error.message);
+    }
   }
 
-  async function razorpayPayment(plan){
+  async function handlePayment(plan){
     try{
       if(!user){
-        setShowLogin(true);
+        dispatch(setShowLogin(true));
+        return;
       }
 
-      let {data}=await axios.post("https://texttoimageai-kirx.onrender.com/api/user/razor-pay",{plan},{
-        headers:{token}
-      })
-    
-      if(data.success){
-        initPay(data.order)
+      const resultAction = await dispatch(razorpayPayment(plan));
+      
+      if(!resultAction.error && resultAction.payload){
+        initPay(resultAction.payload.order);
+      } else {
+        toast.error(resultAction.payload || "Failed to initialize payment");
       }
-
-
     } catch(error){
-      toast.error(error.message)
-      
-      
+      toast.error(error.message);
     }
   }
 
@@ -78,7 +90,7 @@ const BuyCredits = () => {
             <p className='font-semibold mt-3 mb-1'>{item.id}</p>
             <p className='text-sm'>{item.desc}</p>
             <p className='mt-6'><span className='font-medium text-3xl'>${item.price}</span>/ {item.credits} credits</p>
-            <button onClick={()=>{razorpayPayment(item.id)}} className='w-full bg-gray-800 text-white py-2.5 rounded-md text-sm min-w-52 mt-8 '>{user? "Purchase":"Get Started"}</button>
+            <button onClick={()=>{handlePayment(item.id)}} className='w-full bg-gray-800 text-white py-2.5 rounded-md text-sm min-w-52 mt-8 '>{user? "Purchase":"Get Started"}</button>
             </div>
         ))}
       </div>

@@ -7,8 +7,13 @@ import FormData from 'form-data';
 export const imageGenetator=async (req,res)=>{
     try{
         const {userId,prompt}=req.body;
+        console.log('imageGenetator - userId:', userId);
+        console.log('imageGenetator - prompt:', prompt);
+        console.log('imageGenetator - req.body:', req.body);
 
         const user=await User.findById(userId);
+        console.log('imageGenetator - Found user:', user);
+        
         if(!user || !prompt){
             return res.json({
                 success:false,

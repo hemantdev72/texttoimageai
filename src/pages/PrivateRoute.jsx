@@ -1,13 +1,13 @@
 import { Navigate } from "react-router-dom"; 
-import { useContext } from "react";
-import { AppContext } from '../context/AppContex'
+import { useSelector, useDispatch } from "react-redux";
+import { setShowLogin } from '../redux/slices/userSlice';
 
 const PrivateRoute = ({ children }) => {
-    const { user,showLogin,setShowLogin } = useContext(AppContext); 
-
+    const user = useSelector(state => state.user.user);
+    const dispatch = useDispatch();
   
     if (!user) {
-        setShowLogin(true);
+        dispatch(setShowLogin(true));
     }
 
     return children;

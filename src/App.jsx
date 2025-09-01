@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import './App.css'
 import {Routes,Route} from 'react-router-dom';
 import Result from './pages/Result';
@@ -7,14 +7,31 @@ import BuyCredit from './pages/BuyCredit';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Login from './components/Login';
-import { AppContext } from './context/AppContex';
 import PrivateRoute from './pages/PrivateRoute';
 import NotFound from './pages/NotFound';
+import { useEffect } from 'react';
+import { getCredit } from './redux/slices/creditSlice';
+import { useAuthSync } from './hook/useAuthSync';
 
 
 
 function App() {
-  const {showLogin}=useContext(AppContext);
+   useAuthSync();
+  const showLogin = useSelector(state => state.user.showLogin);
+  const isAuthenticated = useSelector(state => state.user.isAuthenticated);
+  const token = useSelector(state => state.user.token);
+  const dispatch = useDispatch();
+
+  
+  useEffect(() => {
+    if (isAuthenticated && token) {
+      console.log('App - Dispatching getCredit');
+      // Fetch user credit
+      dispatch(getCredit());
+    } else {
+      console.log('App - Not authenticated or no token');
+    }
+  }, [isAuthenticated, token, dispatch]);
 
   return (
     <>

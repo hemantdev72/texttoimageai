@@ -20,6 +20,22 @@ app.get('/',(req,res)=>{
     res.send("api working")
 })
 
+// Test endpoint to check JWT_SECRET
+app.get('/test-jwt',(req,res)=>{
+    if(process.env.JWT_SECRET) {
+        res.json({
+            success: true,
+            message: "JWT_SECRET is configured",
+            secretLength: process.env.JWT_SECRET.length
+        })
+    } else {
+        res.json({
+            success: false,
+            message: "JWT_SECRET is not configured"
+        })
+    }
+})
+
 app.listen(PORT,()=>{
     console.log("server is running",PORT)
 })

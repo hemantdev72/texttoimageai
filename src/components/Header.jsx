@@ -1,18 +1,20 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import { assets } from '../assets/assets'
 import { useNavigate } from 'react-router-dom'
-import {motion} from 'motion/react';
-import { AppContext } from '../context/AppContex';
+import { motion } from 'framer-motion';
+import { useSelector, useDispatch } from 'react-redux';
+import { setShowLogin } from '../redux/slices/userSlice';
 
 const Header = () => {
-    const navigate=useNavigate();
-    const {user,setShowLogin}=useContext(AppContext)
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const user = useSelector(state => state.user.user);
 
     const onClickHandler=()=>{
         if(user){
             navigate("/result"); 
         } else{
-            setShowLogin(true)
+            dispatch(setShowLogin(true));
         }
     }
 

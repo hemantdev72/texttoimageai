@@ -1,15 +1,17 @@
-import React,{useContext, useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import { assets } from '../assets/assets'
-import { AppContext } from '../context/AppContex';
-import axios from 'axios'
+import { useDispatch, useSelector } from 'react-redux';
+import { loginUser, registerUser, setShowLogin } from '../redux/slices/userSlice';
+import { getCredit } from '../redux/slices/creditSlice';
 import { toast } from 'react-toastify';
 
 const Login = () => {
-    const [state,setState]=useState('Login');
-    const {setShowLogin,backend,setUser,setToken,setCredit,getCredit}=useContext(AppContext);
-    const [name,setName]=useState("");
-    const [email,setEmail]=useState("");
-    const [password,setPassword]=useState("");
+    const [state, setState] = useState('Login');
+    const dispatch = useDispatch();
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const loading = useSelector(state => state.user.loading);
 
     useEffect(()=>{
         document.body.style.overflow="hidden";
@@ -24,34 +26,31 @@ const Login = () => {
         e.preventDefault();
 
         try{
-            if(state=="Login"){
-                const {data}=await axios.post(`https://texttoimageai-kirx.onrender.com/api/user/login`,{email,password})
+            if(state === "Login"){
+                const resultAction = await dispatch(loginUser({email, password}));
                 
-
-                if(data.success){
-                   localStorage.setItem("token",data.token);
-                    
-setUser(data.user);
-setToken(data.token)
-setShowLogin(false)
-                    
-                } else{
-                    toast.error(data.message)
+                if(!resultAction.error){
+                    dispatch(setShowLogin(false));
+                    dispatch(getCredit());
+                } else {
+                    toast.error(resultAction.payload);
                 }
-            } else{
-                const {data}=await axios.post(`${backend}/user/register`,{email,password,name})
+            } else {
+                const resultAction = await dispatch(registerUser({name, email, password}));
             
-                if(data.success){
-                   localStorage.setItem("token,",data.token);
-                   setToken(data.token) 
-                   setUser(data.user);
-                    setShowLogin(false);
-                } else{
-                    toast.error(data.message)
+                if(!resultAction.error){
+                    // After successful registration, automatically log in
+                    const loginAction = await dispatch(loginUser({email, password}));
+                    if(!loginAction.error){
+                        dispatch(setShowLogin(false));
+                        dispatch(getCredit());
+                    }
+                } else {
+                    toast.error(resultAction.payload);
                 }
             }
         } catch(error){
-            toast.error(error.message)
+            toast.error(error.message);
         }
     }
 
@@ -80,14 +79,19 @@ setShowLogin(false)
 
             <p className='text-sm text-blue-600 my-4 cursor-pointer'>Forgot password?</p>
 
-            <button className='bg-blue-600 w-full text-white py-2 rounded-full'>{state}</button>
+            <button 
+                className='bg-blue-600 w-full text-white py-2 rounded-full disabled:opacity-70 disabled:cursor-not-allowed' 
+                disabled={loading}
+            >
+                {loading ? 'Loading...' : state}
+            </button>
 
                 {state==="Login" ? 
             <p className='mt-5 text-center'>Don't have an account? <span className='text-blue-600 cursor-pointer' onClick={()=>{setState("Sign up")}}>Sign up</span></p> :
 
             <p className='mt-5 text-center'>Already have an account? <span className='text-blue-600 cursor-pointer' onClick={()=>{setState("Login")}}>Login</span></p>}
 
-            <img src={assets.cross_icon} alt=""  className="absolute top-5 right-5 cursor-pointer" onClick={()=>{setShowLogin(false)}} />
+            <img src={assets.cross_icon} alt=""  className="absolute top-5 right-5 cursor-pointer" onClick={()=>{dispatch(setShowLogin(false))}} />
 
         </form>
     </div>
