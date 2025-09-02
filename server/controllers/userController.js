@@ -17,7 +17,7 @@ export const register=async (req,res)=>{
 
     const isUser=await User.findOne({email});
     if(isUser){
-        return res.status(400).json({
+        return res.status(409).json({
             success:false,
             message:"user already exists"
         })
@@ -44,7 +44,7 @@ export const register=async (req,res)=>{
 
    } catch(error){  
     console.log(error)
-        res.json(400).json({
+        res.status(400).json({
             success:false,
             message:error.message
         })
@@ -64,7 +64,7 @@ export const login=async (req,res)=>{
 
         const user=await User.findOne({email});
         if(!user){
-            return res.status(200).json({
+            return res.status(401).json({
                 success:false,
                 message:"User not found"
             })
@@ -72,7 +72,7 @@ export const login=async (req,res)=>{
 
         const compare=await bcrypt.compare(password,user.password);
         if(!compare){
-            return res.status(200).json({
+            return res.status(401).json({
                 message:"wrong credentials",
                 success:false
             })

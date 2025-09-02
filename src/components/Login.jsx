@@ -29,28 +29,30 @@ const Login = () => {
             if(state === "Login"){
                 const resultAction = await dispatch(loginUser({email, password}));
                 
-                if(!resultAction.error){
+                if(resultAction.error){
+                    toast.error(resultAction.payload);
+                } else {
                     dispatch(setShowLogin(false));
                     dispatch(getCredit());
-                } else {
-                    toast.error(resultAction.payload);
                 }
             } else {
                 const resultAction = await dispatch(registerUser({name, email, password}));
             
-                if(!resultAction.error){
+                if(resultAction.error){
+                    toast.error(resultAction.payload);
+                } else {
                     // After successful registration, automatically log in
                     const loginAction = await dispatch(loginUser({email, password}));
-                    if(!loginAction.error){
+                    if(loginAction.error){
+                        toast.error(loginAction.payload);
+                    } else {
                         dispatch(setShowLogin(false));
                         dispatch(getCredit());
                     }
-                } else {
-                    toast.error(resultAction.payload);
                 }
             }
         } catch(error){
-            toast.error(error.message);
+            toast.error(error.message || 'An unexpected error occurred');
         }
     }
 

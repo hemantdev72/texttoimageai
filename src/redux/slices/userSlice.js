@@ -11,11 +11,17 @@ export const loginUser = createAsyncThunk(
         password
       });
     
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      return response.data;
+      // Check if the response indicates success
+      if (response.data.success) {
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        return response.data;
+      } else {
+        // If success is false, treat it as an error
+        return rejectWithValue(response.data.message || 'Login failed');
+      }
     } catch (error) {
-      return rejectWithValue(error.response.data.message || 'Login failed');
+      return rejectWithValue(error.response?.data?.message || 'Login failed');
     }
   }
 );
@@ -29,9 +35,16 @@ export const registerUser = createAsyncThunk(
         email,
         password
       });
-      return response.data;
+      
+      // Check if the response indicates success
+      if (response.data.success) {
+        return response.data;
+      } else {
+        // If success is false, treat it as an error
+        return rejectWithValue(response.data.message || 'Registration failed');
+      }
     } catch (error) {
-      return rejectWithValue(error.response.data.message || 'Registration failed');
+      return rejectWithValue(error.response?.data?.message || 'Registration failed');
     }
   }
 );

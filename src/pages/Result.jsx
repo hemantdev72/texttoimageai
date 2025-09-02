@@ -14,7 +14,6 @@ const Result = () => {
   const { credit } = useSelector(state => state.credit);
   const { user } = useSelector(state => state.user);
 
-  // Fetch credits when component mounts
   useEffect(() => {
     if (user) {
       dispatch(getCredit());
@@ -29,11 +28,11 @@ const Result = () => {
     
     if(!resultAction.error){
       setImage(resultAction.payload);
-      // Update credits after successful generation
+    // update credit after image generated
       dispatch(getCredit());
     } else {
       toast.error(resultAction.payload || 'Failed to generate image');
-      // If it's a credit issue, update credits to show current balance
+      // if credit is low show balance
       dispatch(getCredit());
     }
   }
@@ -47,13 +46,8 @@ const Result = () => {
     viewport={{once:true}}
     action="" className='flex flex-col min-h-[90vh] justify-center items-center gap-4'>
     
-    {/* Credit Display */}
-    {user && (
-      <div className='absolute top-4 right-4 bg-white px-4 py-2 rounded-full shadow-md'>
-        <span className='text-sm text-gray-600'>Credits: </span>
-        <span className='font-semibold text-blue-600'>{credit}</span>
-      </div>
-    )}
+    
+    
     <div>
       <div className='relative'>
         <img src={image} className="max-w-sm rounded" alt="" />
